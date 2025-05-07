@@ -18,7 +18,7 @@
 		"enabled": true
 	},
 	"vars": {
-		"NODE_VERSION": "24"
+		"NODE_VERSION": "22"
 	},
 	"d1_databases": [
     {
