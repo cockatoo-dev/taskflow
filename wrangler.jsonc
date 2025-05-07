@@ -4,16 +4,35 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "taskflow-workers",
+	"name": "taskflow",
 	"main": "./.output/server/index.mjs",
 	"compatibility_date": "2025-05-06",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	"assets": {
 		"binding": "ASSETS",
 		"directory": "./.output/public/"
 	},
 	"observability": {
 		"enabled": true
-	}
+	},
+	"vars": {
+		"NODE_VERSION": "24"
+	},
+	"d1_databases": [
+    {
+      "binding": "CF_DB",
+      "database_name": "taskflow",
+      "database_id": "e9cd83e5-040d-4a89-8f0d-7fbf5d54acd8"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "CF_KV",
+      "id": "8de3464dfddc4d92b4cc8d3eabe103b0"
+    }
+  ]
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
