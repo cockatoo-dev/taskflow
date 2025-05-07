@@ -4,7 +4,7 @@ import type { H3Event } from "h3"
 
 // Check if the API is enabled for read operations.
 export const checkAPIReadEnabled = async (e: H3Event) => {
-  const config = await e.context.cloudflare.env.CF_KV.get("pages_api")
+  const config = await e.context.cloudflare.env.CF_KV.get("workers_api")
   if (!config) {
     throw createError({
       statusCode: 500,
@@ -22,7 +22,7 @@ export const checkAPIReadEnabled = async (e: H3Event) => {
 
 // Check if the API is enabled for write operations.
 export const checkAPIWriteEnabled = async (e: H3Event) => {
-  const kvVal = await e.context.cloudflare.env.CF_KV.get("pages_api")
+  const kvVal = await e.context.cloudflare.env.CF_KV.get("workers_api")
   if (!kvVal) {
     throw createError({
       statusCode: 500,

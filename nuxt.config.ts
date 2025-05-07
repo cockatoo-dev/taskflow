@@ -36,7 +36,7 @@ export default defineNuxtConfig({
 
   security: {
     corsHandler: false,
-    csrf: true
+    // csrf: true
   },
   csurf: {
     methodsToProtect: ['POST', 'PATCH', 'PUT', 'DELETE']
