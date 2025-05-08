@@ -175,7 +175,7 @@
             Taskflow | Check out the project's 
             <NuxtLink 
               class="text-teal-600 dark:text-teal-400 hover:underline" 
-              href='https://github.com/cockatoo-dev/taskflow-webapp'
+              href='https://github.com/cockatoo-dev/taskflow'
               target="_blank"
             >
               Github page.
@@ -183,7 +183,7 @@
             Got a suggestion? Head over to the 
             <NuxtLink 
               class="text-teal-600 dark:text-teal-400 hover:underline" 
-              href='https://github.com/cockatoo-dev/taskflow-webapp/issues'
+              href='https://github.com/cockatoo-dev/taskflow/issues'
               target="_blank"
             >
               issues page.
