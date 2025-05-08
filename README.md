@@ -1,75 +1,22 @@
-# Nuxt Minimal Starter
+<img src="logo-github.webp" alt="Taskflow logo" width="480px">
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+# Taskflow
 
-## Setup
+**Task tracking for keeping your team coordinated.**
 
-Make sure to install dependencies:
+Taskflow is a web app for keeping track of tasks, 
+helping you to keep your team coordinated and reach your goals.
 
-```bash
-# npm
-npm install
+## Open the web app online!
 
-# pnpm
-pnpm install
+**[https://taskflow.cockatoo-dev.workers.dev](https://taskflow.cockatoo-dev.workers.dev)**
 
-# yarn
-yarn install
+## Libraries and frameworks used
 
-# bun
-bun install
-```
+Taskflow is made using Vue 3, Nuxt 3, Nuxt UI v3, Tailwind CSS v4, 
+Chart.js (via vue-chartjs) and Drizzle ORM.
 
-## Development Server
+## Repository information
 
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+This is the new repository created as part of migrating the deployed website to Cloudflare Workers. 
+The old repository can be found [here](httos://github.com/cockatoo-dev/taskflow-webapp).
