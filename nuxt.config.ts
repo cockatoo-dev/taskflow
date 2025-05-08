@@ -36,10 +36,10 @@ export default defineNuxtConfig({
 
   security: {
     corsHandler: false,
-    // csrf: true
+    csrf: true
   },
   csurf: {
-    methodsToProtect: ['POST', 'PATCH', 'PUT', 'DELETE']
+    methodsToProtect: []
   },
   routeRules: {
     '/api/_auth/session': {csurf: false}
