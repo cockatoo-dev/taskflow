@@ -283,6 +283,7 @@
               color="success"
               icon="i-heroicons-check-circle-16-solid"
               :class="BUTTON_SOLID_CLASS"
+              :loading="completeDisabled"
               @click="() => setComplete(true)"
             >
               Mark as Completed
@@ -291,6 +292,7 @@
               v-else
               icon="i-heroicons-exclamation-circle-16-solid"
               :class="BUTTON_SOLID_CLASS"
+              :loading="completeDisabled"
               @click="() => setComplete(false)"
             >
               Mark as Not Completed
