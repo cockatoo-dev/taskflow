@@ -39,7 +39,7 @@ export default defineNuxtConfig({
     csrf: true
   },
   csurf: {
-    methodsToProtect: []
+    methodsToProtect: ['POST', 'PATCH', 'PUT', 'DELETE']
   },
   routeRules: {
     '/api/_auth/session': {csurf: false}
