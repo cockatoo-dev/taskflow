@@ -290,7 +290,7 @@
             </UButton>
             <UButton 
               v-else
-              color="secondary"
+              color="warning"
               icon="heroicons:exclamation-circle-16-solid"
               :class="BUTTON_SOLID_CLASS"
               :loading="completeDisabled"
