@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    "nitro-cloudflare-dev",
+    // "nitro-cloudflare-dev",
     "@nuxt/eslint",
     "nuxt-security",
     "@nuxt/ui",

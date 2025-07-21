@@ -13,7 +13,7 @@ helping you to keep your team coordinated and reach your goals.
 
 ## Libraries and frameworks used
 
-Taskflow is made using Vue 3, Nuxt 3, Nuxt UI v3, Tailwind CSS v4, 
+Taskflow is made using Vue 3, Nuxt 4, Nuxt UI v3, Tailwind CSS v4, 
 Chart.js (via vue-chartjs) and Drizzle ORM.
 
 ## Repository information
