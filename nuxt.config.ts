@@ -8,12 +8,10 @@ export default defineNuxtConfig({
 
     cloudflare: {
       deployConfig: false,
-      // nodeCompat: true
     }
   },
 
   modules: [
-    // "nitro-cloudflare-dev",
     "@nuxt/eslint",
     "nuxt-security",
     "@nuxt/ui",
@@ -41,6 +39,6 @@ export default defineNuxtConfig({
     methodsToProtect: ['POST', 'PATCH', 'PUT', 'DELETE']
   },
   routeRules: {
-    '/api/_auth/session': {csurf: false}
+    '/api/_auth/**': {csurf: false}
   }
 })
