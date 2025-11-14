@@ -11,6 +11,7 @@
       boardId: route.params.boardId,
       taskId: route.query.taskId
     },
+    key: `task-info-${route.params.boardId}-${route.query.taskId}`,
     method: 'get'
   })
 
@@ -141,6 +142,9 @@
   // Set the completed status of this task and refresh the task data.
   const setComplete = async (value: boolean) => {
     completeDisabled.value = true
+    if (data.value?.task) {
+      data.value.task.isComplete = value
+    }
 
     await $csrfFetch('/api/task/complete', {
       method: 'POST',
@@ -151,6 +155,9 @@
       }
     })
     .catch((err) => {
+      if (data.value?.task) {
+        data.value.task.isComplete = !value
+      }
       toast.add({
         title: 'Error',
         description: err.data.message || err.message,

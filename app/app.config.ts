@@ -13,6 +13,7 @@ export default defineAppConfig({
     },
     icons: {
       loading: 'heroicons:arrow-path-16-solid',
+      close: 'heroicons:x-mark-16-solid'
     }
   }
 })
