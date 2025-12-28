@@ -19,7 +19,8 @@
       :title 
       :public-perms 
       is-owner 
-      :refresh 
+      :refresh
+      :categories="[]"
     />
     <div class="grid grid-cols-[1fr_auto]">
       <div class="pl-2 pr-1">

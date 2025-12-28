@@ -9,6 +9,8 @@
 
   // State variables
   const searchValue = ref('')
+  const categorySelectOpen = ref(false)
+  const categoryFilter = ref<string | null>(null)
   const showBoardSettings = ref(false)
   const showBoardInvite = ref(false)
   const showAddTask = ref(false)
@@ -45,6 +47,40 @@
     ogDescription: 'Task tracking for keeping your team coordinated.'
   })
 
+  const categoryOptions = computed(() => {
+    type CategoryOptionType = {
+      label: string
+      value: string | null
+      colour: string | null
+    }
+    const result: CategoryOptionType[] = [
+      {
+        label: 'All Categories',
+        value: 'all',
+        colour: null
+      },
+      {
+        label: 'Uncategorised',
+        value: null,
+        colour: null
+      }
+    ]
+    if (data.value) {
+      for (const i of data.value.board.categories) {
+        result.push({
+          label: i.title,
+          value: i.categoryId,
+          colour: i.colour
+        })
+      }
+    }
+    return result
+  })
+
+  const selectedCategoryOption = computed(() => {
+    return categoryOptions.value.find(opt => opt.value === categoryFilter.value)
+  })
+
   // Generate sorted array of tasks to be displayed, which
   // is filtered by the search value 
   const displayTasks = computed(() => {
@@ -58,14 +94,20 @@
     const result: typeof sorted = []
     for (const i of sorted) {
       if (
-        i.title.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-        i.description.toLowerCase().includes(searchValue.value.toLowerCase())
+        (categoryFilter.value === 'all' || i.categoryId === categoryFilter.value) &&
+        (i.title.toLowerCase().includes(searchValue.value.toLowerCase()) ||
+        i.description.toLowerCase().includes(searchValue.value.toLowerCase()))
       ) {
         result.push(i)
       }
     }
     return result
   })
+
+  const resetSearch = () => {
+    searchValue.value = ''
+    categoryFilter.value = 'all'
+  }
 
   // Generate board statistics
   // - complete: number of tasks that are complete
@@ -127,16 +169,22 @@
         :title="data.board.title || ''"
         :public-perms="data.board.publicPerms || 0"
         :is-owner="data.board.isOwner || false"
+        :categories="data.board.categories"
         :refresh
       />
       <BoardInviteModal v-model="showBoardInvite" />
-      <AddTaskModal v-model="showAddTask" :board-id="route.params.boardId || ''" /> 
+      <AddTaskModal 
+        v-model="showAddTask" 
+        :board-id="route.params.boardId || ''" 
+        :categories="data.board.categories" 
+        :refresh="refresh" 
+      /> 
       <div class="w-full h-full">
-        <div class="h-10 p-1 grid grid-cols-[1fr_auto]">
+        <div class="h-10 px-2 py-1 grid grid-cols-[1fr_auto]">
           <h1 class="px-1 pt-1.5 lg:pt-0.5 lg:text-2xl text-center font-bold line-clamp-1 overflow-ellipsis">
             {{ data.board.title }}
           </h1>
-          <div v-if="data.board.isOwner">
+          <div v-if="canEdit(data.board)">
             <div class="block lg:hidden">
               <UDropdownMenu
                 :items="[
@@ -203,7 +251,7 @@
         
         <div 
           v-if="canEdit(data.board)"
-          class="h-10 p-1 grid grid-cols-[1fr_auto]"
+          class="h-10 px-2 py-1 grid grid-cols-[1fr_auto]"
         >
           <h2 class="pl-2 pt-0.5 leading-8 text-2xl">Current Tasks</h2>
           <UButton 
@@ -219,22 +267,82 @@
           <h2 class="pl-2 pt-0.5 leading-8 text-2xl">Current Tasks</h2>
         </div>
 
-        <div class="p-1">
-          <label class="sr-only" for="tasks-search">Search for a task. The list of tasks will update automatically.</label>
-          <UInput 
-            id="tasks-search"
-            v-model="searchValue"
-            autocomplete="off"
-            variant="outline"
-            icon="heroicons:magnifying-glass-16-solid"
-            placeholder="Search for a task..."
-            class="w-full"
-            :ui="TEXT_INPUT_UI"
-          />
+        <div class="px-2 py-1 md:grid md:grid-cols-2 lg:grid-cols-[2fr_1fr] gap-1">
+          <div class="max-md:pb-1">
+            <label class="sr-only" for="tasks-search">Search for a task. The list of tasks will update automatically.</label>
+            <UInput 
+              id="tasks-search"
+              v-model="searchValue"
+              autocomplete="off"
+              variant="outline"
+              icon="heroicons:magnifying-glass-16-solid"
+              placeholder="Search for a task..."
+              class="w-full"
+              :ui="TEXT_INPUT_UI"
+            />
+          </div>
+          <div>
+            <label class="sr-only" for="category-filter">Filter tasks by category. The list of tasks will update automatically.</label>
+            <!-- Hidden select for accessibility -->
+            <select
+              id="category-filter"
+              v-model="categoryFilter"
+              class="sr-only"
+            >
+              <option 
+                v-for="option in categoryOptions" 
+                :key="option.value || 'uncategorized'"
+                :value="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+            <UPopover v-model:open="categorySelectOpen">
+              <UButton
+                id="category-filter"
+                variant="outline"
+                color="neutral"
+                :class="BUTTON_GHOST_CLASS + ' w-full'"
+                trailing-icon="heroicons:chevron-down-16-solid"
+              >
+                <div v-if="categoryFilter === 'all'" class="w-full text-left">All Categories</div>
+                <div v-else class="w-full flex gap-2">
+                  <CategoryIcon :colour="selectedCategoryOption?.colour || null" />
+                  <div class="line-clamp-1 text-ellipsis">{{ selectedCategoryOption?.label || 'Uncategorized' }}</div>
+                </div>
+              </UButton>
+              <template #content>
+                <div class="w-[calc(100vw-1rem)] sm:w-[calc(50vw-1rem)] md:w-[calc(25vw-1rem)] lg:w-[calc((100vw-2rem)/4)] grid grid-cols-1 gap-1 p-1">
+                  <div 
+                    v-for="option in categoryOptions" 
+                    :key="option.value || 'uncategorized'"
+                  >
+                    <UButton
+                      type="button"
+                      color="neutral"
+                      :variant="selectedCategoryOption?.value === option.value ? 'subtle' : 'ghost'"
+                      :class="BUTTON_GHOST_CLASS + ' w-full'"
+                      :trailing-icon="selectedCategoryOption?.value === option.value ? 'heroicons:check-16-solid' : null"
+                      @click="() => {
+                        categoryFilter = option.value;
+                        categorySelectOpen = false;
+                      }"
+                    >
+                      <div v-if="option.value === 'all'" class="w-full text-left">All Categories</div>
+                      <div v-else class="w-full flex gap-2">
+                        <CategoryIcon :colour="option.colour || null" />
+                        <div class="line-clamp-1 text-ellipsis">{{ option.label || 'Uncategorized' }}</div>
+                      </div>
+                    </UButton>
+                  </div>
+                </div>
+              </template>
+            </UPopover>
+          </div>
         </div>
         <ul
-          v-if="data && data.tasks.length > 0" 
-          class="lg:grid lg:grid-cols-2 2xl:grid-cols-3 p-2 lg:p-4 lg:gap-4 max-h-[calc(100vh-11rem)] overflow-y-auto list-none m-0"
+          v-if="displayTasks.length > 0" 
+          class="lg:grid lg:grid-cols-2 2xl:grid-cols-3 p-2 lg:p-4 lg:gap-4 max-h-[calc(100vh-13.25rem)] md:max-h-[calc(100vh-10.75rem)] overflow-y-auto list-none m-0"
         >
           <li 
             v-for="item of displayTasks" 
@@ -248,16 +356,41 @@
               :description="item.description"
               :is-complete="item.isComplete"
               :num-deps="item.numDeps"
+              :category-title="item.categoryTitle"
+              :category-colour="item.categoryColour"
             />
           </li>
         </ul>
+        <div v-else-if="data && data.tasks.length > 0">
+          <h3 class="font-bold text-3xl text-center pt-8 pb-4">
+            No tasks found.
+          </h3>
+          <div class="text-center">
+            <UButton 
+              type="button"
+              variant="ghost"
+              icon="heroicons:arrow-path-16-solid"
+              :class="BUTTON_GHOST_CLASS"
+              @click="resetSearch"
+            >
+              Reset Search
+            </UButton>
+          </div>
+        </div>
         <div v-else class="pt-8">
-          <h3 class="font-bold text-3xl text-center">
+          <h3 class="font-bold text-3xl text-center pt-8 pb-4">
             No tasks!
           </h3>
-          <p class="text-center">
-            Click "Add Task" above to create a task.
-          </p>
+          <div class="text-center">
+            <UButton 
+              type="button"
+              icon="heroicons:plus-16-solid"
+              :class="BUTTON_SOLID_CLASS"
+              @click="() => {showAddTask = true}"
+            >
+              Add a Task
+            </UButton>
+          </div>
         </div>
       </div>
       <div class="hidden sm:block w-full max-h-[calc(100vh-3rem)] overflow-y-auto p-1 lg:p-2">

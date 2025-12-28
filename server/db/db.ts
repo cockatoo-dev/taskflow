@@ -1,7 +1,7 @@
 import { and, eq, or, asc, exists, lt, sql, gt, gte, lte, ne } from 'drizzle-orm'
 import { drizzle, type DrizzleD1Database } from 'drizzle-orm/d1'
 import type { H3Event } from "h3"
-import { deps, tasks, boards } from './schema'
+import { deps, tasks, boards, categories } from './schema'
 
 export class db {
   private _db: DrizzleD1Database
@@ -18,7 +18,7 @@ export class db {
     const dbData = await this._db.select({ boardId: boards.boardId })
     .from(boards)
     .where(eq(boards.boardId, boardId))
-
+  
     return dbData.length > 0
   }
 
@@ -28,8 +28,16 @@ export class db {
    * @returns board name, owner ID, and public permissions
    */
   public getBoard = async (boardId: string) => {
-    return (await this._db.select()
+    return (await this._db.select({
+      title: boards.title,
+      ownerId: boards.ownerId,
+      publicPerms: boards.publicPerms,
+      categoryId: categories.categoryId,
+      categoryTitle: categories.title,
+      categoryColour: categories.colour
+    })
     .from(boards)
+    .leftJoin(categories, eq(boards.boardId, categories.boardId))
     .where(eq(boards.boardId, boardId)))
   }
 
@@ -98,6 +106,37 @@ export class db {
         eq(boards.ownerId, ownerId)
       ))
     ])
+  }
+
+  public addCategory = async (
+    categoryId: string,
+    boardId: string,
+    title: string,
+    colour: string
+  ) => {
+    await this._db.insert(categories).values({
+      categoryId,
+      boardId,
+      title,
+      colour
+    })
+  }
+
+  public editCategory = async (
+    categoryId: string,
+    title: string,
+    colour: string
+  ) => {
+    await this._db.update(categories).set({
+      title,
+      colour
+    })
+    .where(eq(categories.categoryId, categoryId))
+  }
+
+  public deleteCategory = async (categoryId: string) => {
+    await this._db.delete(categories)
+    .where(eq(categories.categoryId, categoryId))
   }
 
   /**
@@ -176,8 +215,19 @@ export class db {
    * @returns task ID, title, description, number of dependencies, and completion status
    */
   public getTask = async (boardId: string, taskId: string) => {
-    return (await this._db.select()
+    return (await this._db.select({
+      taskId: tasks.taskId,
+      boardId: tasks.boardId,
+      title: tasks.title,
+      description: tasks.description,
+      numDeps: tasks.numDeps,
+      isComplete: tasks.isComplete,
+      categoryId: tasks.categoryId,
+      categoryTitle: categories.title,
+      categoryColour: categories.colour
+    })
     .from(tasks)
+    .leftJoin(categories, eq(tasks.categoryId, categories.categoryId))
     .where(and(
       eq(tasks.boardId, boardId),
       eq(tasks.taskId, taskId)
@@ -217,8 +267,19 @@ export class db {
    * @returns array of tasks (task ID, title, description, number of dependencies, and completion status)
    */
   public getBoardTasks = async (boardId: string) => {
-    return await this._db.select()
+    return await this._db.select({
+      taskId: tasks.taskId,
+      boardId: tasks.boardId,
+      title: tasks.title,
+      description: tasks.description,
+      categoryId: tasks.categoryId,
+      numDeps: tasks.numDeps,
+      isComplete: tasks.isComplete,
+      categoryTitle: categories.title,
+      categoryColour: categories.colour
+    })
     .from(tasks)
+    .leftJoin(categories, eq(tasks.categoryId, categories.categoryId))
     .where(eq(tasks.boardId, boardId))
     .orderBy(asc(tasks.title))
   }
@@ -233,9 +294,13 @@ export class db {
       id: tasks.taskId,
       title: tasks.title,
       isComplete: tasks.isComplete,
-      numDeps: tasks.numDeps
+      numDeps: tasks.numDeps,
+      categoryId: tasks.categoryId,
+      categoryTitle: categories.title,
+      categoryColour: categories.colour
     })
     .from(tasks)
+    .leftJoin(categories, eq(tasks.categoryId, categories.categoryId))
     .where(eq(tasks.boardId, boardId))
     .orderBy(asc(tasks.title))
   }
@@ -247,13 +312,14 @@ export class db {
    * @param title task title
    * @param description task description
    */
-  public addTask = async (boardId: string, taskId: string, title: string, description: string) => {
+  public addTask = async (boardId: string, taskId: string, title: string, description: string, categoryId: string | null) => {
     await this._db.insert(tasks)
     .values({ 
       boardId,
       taskId,
       title,
       description,
+      categoryId,
       numDeps: 0,
       isComplete: false
     })
@@ -265,9 +331,9 @@ export class db {
    * @param title task title
    * @param description task description
    */
-  public editTask = async (taskId: string, title: string, description: string) => {
+  public editTask = async (taskId: string, title: string, description: string, categoryId: string | null) => {
     await this._db.update(tasks)
-    .set({ title, description })
+    .set({ title, description, categoryId })
     .where(eq(tasks.taskId, taskId))
   }
 
@@ -428,7 +494,7 @@ export class db {
   }
 
   /**
-   * Get all dependencies between tasks for a board.
+   * Get all dependencies between tasks for a board, for use with the dependency checker.
    * @param boardId board ID
    * @returns array of dependencies (source task ID, dest task ID)
    */
@@ -453,11 +519,15 @@ export class db {
       title: tasks.title,
       numDeps: tasks.numDeps,
       isComplete: tasks.isComplete,
+      categoryId: tasks.categoryId,
+      categoryTitle: categories.title,
+      categoryColour: categories.colour
     })
     .from(deps)
     .orderBy(asc(tasks.title))
     .where(eq(deps.dest, dest))
     .innerJoin(tasks, eq(deps.source, tasks.taskId))
+    .leftJoin(categories, eq(tasks.categoryId, categories.categoryId))
   }
 
   /**
@@ -471,11 +541,15 @@ export class db {
       title: tasks.title,
       numDeps: tasks.numDeps,
       isComplete: tasks.isComplete,
+      categoryId: tasks.categoryId,
+      categoryTitle: categories.title,
+      categoryColour: categories.colour
     })
     .from(deps)
     .orderBy(asc(tasks.title))
     .where(eq(deps.source, source))
     .innerJoin(tasks, eq(deps.dest, tasks.taskId))
+    .leftJoin(categories, eq(tasks.categoryId, categories.categoryId))
   }
 
   /**

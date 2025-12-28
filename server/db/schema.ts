@@ -8,11 +8,23 @@ export const boards = sqliteTable('boards', {
   publicPerms: integer('publicPerms').notNull()
 })
 
+export const categories = sqliteTable('categories', {
+  categoryId: text('categoryId').primaryKey(),
+  boardId: text('boardId').references(() => boards.boardId, {onDelete: 'cascade'}).notNull(),
+  title: text('title').notNull(),
+  colour: text('colour').notNull()
+}, (t) => {
+  return [
+    index('boardCategoryIndex').on(t.boardId)
+  ]
+})
+
 export const tasks = sqliteTable('tasks', {
   taskId: text('taskId').primaryKey(),
   boardId: text('boardId').references(() => boards.boardId, {onDelete: 'cascade'}).notNull(),
   title: text('title').notNull(),
   description: text('description').notNull(),
+  categoryId: text('categoryId').references(() => categories.categoryId, {onDelete: 'set null'}),
   numDeps: integer('numDeps').notNull(),
   isComplete: integer('isComplete', { mode: 'boolean' }).notNull()
 }, (t) => {

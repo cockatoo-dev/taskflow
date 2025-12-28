@@ -17,6 +17,7 @@ export const BUTTON_UI_OBJECT = {
 
 export const BUTTON_SOLID_CLASS = 'text-base font-bold text-slate-100 dark:text-slate-900'
 export const BUTTON_GHOST_CLASS = 'text-base font-normal'
+export const BUTTON_CATEGORY_CLASS = 'text-base font-normal'
 export const GITHUB_BUTTON_CLASS = 'bg-slate-900 hover:bg-slate-800 active:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:active:bg-slate-200 text-slate-100 dark:text-slate-900 focus-visible:outline-slate-900 dark:focus-visible:outline-slate-100 text-base font-bold'
 
 export const GITHUB_BUTTON_UI_OBJECT = {
@@ -41,6 +42,57 @@ export const DROPDOWN_UI_OBJECT = {item: {
   inactive:'text-teal-600 dark:text-teal-400',
   icon: {active: 'text-teal-600 dark:text-teal-400', inactive: 'text-teal-600 dark:text-teal-400'}
 }}
+
+export const CATEGORY_COLOURS = [
+  'orange',
+  'yellow',
+  'lime',
+  'teal',
+  'cyan',
+  'violet',
+  'fuchsia',
+  'pink'
+]
+
+export const categoryColourClass = (colour: string) => {
+  if (colour === 'orange') {
+    return 'bg-orange-500 dark:bg-orange-500'
+  } else if (colour === 'yellow') {
+    return 'bg-yellow-500 dark:bg-yellow-500'
+  } else if (colour === 'lime') {
+    return 'bg-lime-500 dark:bg-lime-500'
+  } else if (colour === 'teal') {
+    return 'bg-teal-500 dark:bg-teal-500'
+  } else if (colour === 'cyan') {
+    return 'bg-cyan-500 dark:bg-cyan-500'
+  } else if (colour === 'violet') {
+    return 'bg-violet-500 dark:bg-violet-500'
+  } else if (colour === 'fuchsia') {
+    return 'bg-fuchsia-500 dark:bg-fuchsia-500'
+  } else if (colour === 'pink') {
+    return 'bg-pink-500 dark:bg-pink-500'
+  } else {
+    return 'bg-slate-500 dark:bg-slate-500'
+  }
+}
+
+export const isValidCategoryColour = (colour: string | null) => {
+  if (colour === null) {
+    return true
+  } else {
+    return CATEGORY_COLOURS.includes(colour)
+  }
+}
+
+export const isAvailableCategoryColour = (colour: string, categories: {colour: string | null}[]) => {
+  const colours = new Set(CATEGORY_COLOURS)
+  for (const category of categories) {
+    if (category.colour !== null) {
+      colours.delete(category.colour)
+    }
+  }
+  return colours.has(colour)
+}
 
 /**
  * Generates a number for a task based on completion and dependencies, used for sorting tasks.

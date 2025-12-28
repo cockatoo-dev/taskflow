@@ -6,6 +6,8 @@
   const props = defineProps<{
     title: string,
     description: string,
+    categoryId: string | null,
+    categories: CategoryType[],
     refresh: () => Promise<void>
   }>()
 
@@ -14,6 +16,8 @@
   // Form state variables
   const editTitle = ref('')
   const editDescription = ref('')
+  const editCategory = ref<string | null>(null)
+  const showAddCategoryModal = ref(false)
   const disableSubmit = ref(false)
   const errorMessage = ref('')
 
@@ -22,6 +26,7 @@
     if (isVisible.value) {
       editTitle.value = props.title
       editDescription.value = props.description
+      editCategory.value = props.categoryId
       errorMessage.value = ''
       disableSubmit.value = false
     }
@@ -50,7 +55,8 @@
           boardId: route.params.boardId,
           taskId: route.query.taskId,
           title: editTitle.value,
-          description: editDescription.value
+          description: editDescription.value,
+          categoryId: editCategory.value
         }
       })
       await props.refresh()
@@ -68,6 +74,13 @@
     title="Edit Task Details"
     description="Edit the task title and descriptions."
   >
+    <AddCategoryModal 
+      v-model="showAddCategoryModal"
+      :board-id="route.params.boardId || ''"
+      :categories="props.categories"
+      :refresh="props.refresh"
+      @added="(id) => {editCategory = id}"
+    />
     <div class="w-full p-4">
       <h3 class="text-3xl font-bold pb-2">Edit Task Details</h3>
       <form @submit.prevent="submitForm">
@@ -84,6 +97,78 @@
           />
           <CharLimit :str="editTitle" :limit="50" :show-length="40" />
         </div>
+
+        <div>
+          <div class="block pb-2 font-bold">Task Category</div>
+          <!-- Hidden select for screen readers -->
+          <label class="sr-only" for="edit-category">
+            Select an existing task category. To add a new category, click the "New Category" button below, and the new category you add will be automatically selected.
+          </label>
+          <select 
+            id="edit-category" 
+            class="sr-only" 
+            v-model="editCategory"
+          >
+            <option :value="null">Uncategorised</option>
+            <option 
+              v-for="cat of props.categories" 
+              :key="cat.categoryId"
+              :value="cat.categoryId"
+            >
+              {{ cat.title }}
+            </option>
+          </select>
+          <div class="flex flex-wrap gap-2 pb-4">
+            <div>
+              <UButton 
+                type="button"
+                variant="outline"
+                color="neutral"
+                :trailing-icon="editCategory === null ? 'heroicons:check-16-solid' : undefined"
+                :aria-checked="editCategory === null ? 'true' : 'false'"
+                :class="BUTTON_CATEGORY_CLASS"
+                @click="() => { editCategory = null }"
+              >
+                <div class="flex gap-2">
+                  <CategoryIcon :colour="null" />
+                  <div>Uncategorised</div>
+                </div>
+              </UButton>
+            </div>
+            <div 
+              v-for="cat of props.categories" 
+              :key="cat.categoryId"
+            >
+              <UButton 
+                type="button"
+                variant="outline"
+                color="neutral"
+                :trailing-icon="editCategory === cat.categoryId ? 'heroicons:check-16-solid' : undefined"
+                :aria-checked="editCategory === cat.categoryId ? 'true' : 'false'"
+                :class="BUTTON_CATEGORY_CLASS"
+                @click="() => { editCategory = cat.categoryId }"
+              >
+                <div class="flex gap-2">
+                  <CategoryIcon :colour="cat.colour" />
+                  <div>{{ cat.title }}</div>
+                </div>
+              </UButton>
+            </div>
+            <div v-if="categories.length < 8">
+              <UButton 
+                type="button"
+                icon="heroicons:plus-16-solid"
+                variant="outline"
+                color="neutral"
+                :class="BUTTON_CATEGORY_CLASS"
+                @click="() => {showAddCategoryModal = true}"
+              >
+                New Category
+              </UButton>
+            </div>
+          </div>
+        </div>
+
         <div class="pb-2">
           <label for="edit-description" class="block pb-2 font-bold">Description</label>
           <UTextarea

@@ -260,6 +260,8 @@
           v-model="showEdit"
           :title="data?.task?.title || ''"
           :description="data?.task?.description || ''"
+          :category-id="data?.task?.categoryId || null"
+          :categories="data?.board.categories || []"
           :refresh
         />
         <DeleteTaskModal 
@@ -281,6 +283,15 @@
             {{ data.task?.title }}
           </h1>
 
+          <div class="pb-4">
+            <div class="w-fit rounded-sm px-2 py-1 ring-1 ring-slate-300 dark:ring-slate-700 flex gap-2">
+              <CategoryIcon :colour="data.task?.categoryColour || null" />
+              <div>
+                {{ data.task?.categoryTitle || 'Uncategorised' }}
+              </div>
+            </div>
+          </div>
+
           <div 
             v-if="canSetComplete(data.board)" 
             class="text-center pb-2"
@@ -289,7 +300,7 @@
               v-if="!data.task?.isComplete"
               color="success"
               icon="heroicons:check-circle-16-solid"
-              :class="BUTTON_SOLID_CLASS"
+              :class="BUTTON_SOLID_CLASS + ' w-full justify-center'"
               :loading="completeDisabled"
               @click="() => setComplete(true)"
             >
@@ -299,7 +310,7 @@
               v-else
               color="warning"
               icon="heroicons:exclamation-circle-16-solid"
-              :class="BUTTON_SOLID_CLASS"
+              :class="BUTTON_SOLID_CLASS + ' w-full justify-center'"
               :loading="completeDisabled"
               @click="() => setComplete(false)"
             >
@@ -330,6 +341,8 @@
                       :title="item.title"
                       :is-complete="item.isComplete"
                       :num-deps="item.numDeps"
+                      :category-title="item.categoryTitle"
+                      :category-colour="item.categoryColour"
                     />
                     <div class="pl-1">
                       <UButton 
@@ -379,6 +392,8 @@
                       :title="item.title"
                       :is-complete="item.isComplete"
                       :num-deps="item.numDeps"
+                      :category-title="item.categoryTitle"
+                      :category-colour="item.categoryColour"
                     />
                     <div class="pl-1">
                       <UButton 
@@ -422,6 +437,8 @@
                     :title="item.title"
                     :is-complete="item.isComplete"
                     :num-deps="item.numDeps"
+                    :category-title="item.categoryTitle"
+                    :category-colour="item.categoryColour"
                   />
                 </div>
               </div>

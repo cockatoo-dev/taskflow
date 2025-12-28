@@ -122,7 +122,7 @@
             color="error"
             icon="heroicons:trash-16-solid"
             variant="ghost"
-            :class="BUTTON_SOLID_CLASS"
+            :class="BUTTON_GHOST_CLASS"
             @click="() => {showDeleteAccount = true}"
           >
             Delete Account

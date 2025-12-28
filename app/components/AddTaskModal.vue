@@ -3,12 +3,16 @@
   const { $csrfFetch } = useNuxtApp()
   const isVisible = defineModel<boolean>()
   const props = defineProps<{
-    boardId: string | string[]
+    boardId: string | string[],
+    categories: CategoryType[],
+    refresh: () => Promise<void>
   }>()
 
   // Form state variables
   const title = ref('')
   const description = ref('')
+  const category = ref<string | null>(null)
+  const showAddCategoryModal = ref(false)
   const disableSubmit = ref(false)
   const errorMessage = ref('')
 
@@ -34,7 +38,8 @@
         body: {
           boardId: props.boardId,
           title: title.value,
-          description: description.value
+          description: description.value,
+          categoryId: category.value
         }
       })
       navigateTo(`/board/${props.boardId}/task?taskId=${result.taskId}`)
@@ -51,6 +56,7 @@
       description.value = ''
       disableSubmit.value = false
       errorMessage.value = ''
+      category.value = null
     }
   })
 </script>
@@ -61,6 +67,13 @@
     title="Add New Task"
     description="Fill out this form to add a new task."
   >
+    <AddCategoryModal 
+      v-model="showAddCategoryModal"
+      :board-id="props.boardId"
+      :categories="props.categories"
+      :refresh="props.refresh"
+      @added=" (id) => { category = id }"
+    />
     <div class="w-full p-4">
       <div class="text-3xl font-bold pb-2">Add New Task</div>
       <form @submit.prevent="submitForm">
@@ -77,6 +90,78 @@
           />
           <CharLimit :str="title" :limit="50" :show-length="40" />
         </div>
+
+        <div>
+          <div class="block pb-2 font-bold">Task Category</div>
+          <!-- Hidden select for screen readers -->
+          <label class="sr-only" for="add-category">
+            Select an existing task category. To add a new category, click the "New Category" button below, and the new category you add will be automatically selected.
+          </label>
+          <select 
+            id="add-category" 
+            class="sr-only" 
+            v-model="category"
+          >
+            <option :value="null">Uncategorised</option>
+            <option 
+              v-for="cat of props.categories" 
+              :key="cat.categoryId"
+              :value="cat.categoryId"
+            >
+              {{ cat.title }}
+            </option>
+          </select>
+          <div class="flex flex-wrap gap-2 pb-4">
+            <div>
+              <UButton 
+                type="button"
+                variant="outline"
+                color="neutral"
+                :trailing-icon="category === null ? 'heroicons:check-16-solid' : undefined"
+                :aria-checked="category === null ? 'true' : 'false'"
+                :class="BUTTON_CATEGORY_CLASS"
+                @click="() => { category = null }"
+              >
+                <div class="flex gap-2">
+                  <CategoryIcon :colour="null" />
+                  <div>Uncategorised</div>
+                </div>
+              </UButton>
+            </div>
+            <div 
+              v-for="cat of props.categories" 
+              :key="cat.categoryId"
+            >
+              <UButton 
+                type="button"
+                variant="outline"
+                color="neutral"
+                :trailing-icon="category === cat.categoryId ? 'heroicons:check-16-solid' : undefined"
+                :aria-checked="category === cat.categoryId ? 'true' : 'false'"
+                :class="BUTTON_CATEGORY_CLASS"
+                @click="() => { category = cat.categoryId }"
+              >
+                <div class="flex gap-2">
+                  <CategoryIcon :colour="cat.colour" />
+                  <div>{{ cat.title }}</div>
+                </div>
+              </UButton>
+            </div>
+            <div v-if="categories.length < 8">
+              <UButton 
+                type="button"
+                icon="heroicons:plus-16-solid"
+                variant="outline"
+                color="neutral"
+                :class="BUTTON_CATEGORY_CLASS"
+                @click="() => {showAddCategoryModal = true}"
+              >
+                New Category
+              </UButton>
+            </div>
+          </div>
+        </div>
+        
         <div class="pb-2">
           <label for="add-description" class="block pb-2 font-bold">Description</label>
           <UTextarea
@@ -88,6 +173,7 @@
           />
           <CharLimit :str="description" :limit="2500" :show-length="2250" />
         </div>
+
         <div class="pb-2">Dependencies for this task can be added after the task is added to the board.</div>
         <div class="pb-2 font-bold">This board can be opened by anyone on the internet with this board's board code or a link to this board. Do not put anything sensitive in the task title or description.</div>
         <div class="flex gap-2 sm:gap-4">

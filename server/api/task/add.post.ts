@@ -4,7 +4,8 @@ import { useDB } from "~~/server/db/db"
 const bodySchema = z.object({
   boardId: z.string(),
   title: z.string(),
-  description: z.string()
+  description: z.string(),
+  categoryId: z.string().nullable()
 })
 
 // POST /api/task/add
@@ -51,7 +52,7 @@ export default defineEventHandler(async (e) => {
     })
   }
 
-  await db.addTask(bodyData.boardId, taskId, bodyData.title, bodyData.description)
+  await db.addTask(bodyData.boardId, taskId, bodyData.title, bodyData.description, bodyData.categoryId)
 
   return { taskId }
 })

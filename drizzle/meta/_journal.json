@@ -8,6 +8,13 @@
       "when": 1746645942188,
       "tag": "0000_red_klaw",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1766840319177,
+      "tag": "0001_orange_paibok",
+      "breakpoints": true
     }
   ]
 }

@@ -5,7 +5,8 @@ const bodySchema = z.object({
   boardId: z.string(),
   taskId: z.string(),
   title: z.string(),
-  description: z.string()
+  description: z.string(),
+  categoryId: z.string().nullable()
 })
 
 // POST /api/task/edit
@@ -47,6 +48,6 @@ export default defineEventHandler(async (e) => {
 
   await checkTaskExists(db, bodyData.boardId, bodyData.taskId)
 
-  await db.editTask(bodyData.taskId, bodyData.title, bodyData.description)
+  await db.editTask(bodyData.taskId, bodyData.title, bodyData.description, bodyData.categoryId)
   setResponseStatus(e, 204)
 })
