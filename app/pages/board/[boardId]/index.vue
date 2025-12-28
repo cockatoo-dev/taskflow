@@ -10,7 +10,7 @@
   // State variables
   const searchValue = ref('')
   const categorySelectOpen = ref(false)
-  const categoryFilter = ref<string | null>(null)
+  const categoryFilter = ref<string | null>('all')
   const showBoardSettings = ref(false)
   const showBoardInvite = ref(false)
   const showAddTask = ref(false)
