@@ -45,7 +45,7 @@ export default defineEventHandler(async (e) => {
     })
   }
   const boardTasks = await db.getBoardTasksInfo(bodyData.boardId)
-  if (boardTasks.length >= 50) {
+  if (boardTasks.length >= 80) {
     throw createError({
       status: 400,
       message: "You've reached the maximum number of tasks for this board. Consider deleting an existing task before creating a new task."

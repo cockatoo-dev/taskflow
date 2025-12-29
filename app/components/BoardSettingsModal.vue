@@ -78,7 +78,19 @@
       :categories="categories"
       :refresh="props.refresh"
     />
-    <div class="w-full p-4">
+    <div class="w-full p-4 relative">
+      <div class="absolute top-2 right-2">
+        <UButton 
+          type="button"
+          color="neutral"
+          icon="heroicons:x-mark-16-solid"
+          variant="ghost"
+          :class="BUTTON_GHOST_CLASS"
+          @click="() => {isVisible = false}"
+        >
+          Close
+        </UButton>
+      </div>
       <div v-if="$route.path !== '/account'">
         <h3 class="text-3xl font-bold pb-2">Task Categories</h3>
         <div v-if="categories.length === 0" class="pb-2">

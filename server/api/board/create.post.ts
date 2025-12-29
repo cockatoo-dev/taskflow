@@ -39,7 +39,7 @@ export default defineEventHandler(async (e) => {
   
   const db = useDB(e)
   const userBoards = await db.getUserBoards(userId)
-  if (userBoards.length >= 5) {
+  if (userBoards.length >= 8) {
     throw createError({
       status: 400,
       message: "You've reached the maximum number of boards for your account. Consider deleting an existing board before you create a new one."
