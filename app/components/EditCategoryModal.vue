@@ -131,7 +131,6 @@
                     <UButton
                       type="button"
                       :variant="option === colour ? 'outline' : 'ghost'"
-                      :ui="{base: 'px-1.5'}"
                       @click="() => { 
                         colour = option 
                         colourSelectOpen = false
