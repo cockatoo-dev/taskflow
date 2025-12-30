@@ -123,7 +123,7 @@
               </UButton>
               
               <template #content>
-                <div class="grid grid-cols-4 gap-2">
+                <div class="grid grid-cols-4 gap-2 p-2">
                   <div 
                     v-for="option in colourOptions" 
                     :key="option"

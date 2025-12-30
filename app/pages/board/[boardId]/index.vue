@@ -283,7 +283,7 @@
           </div>
           <div>
             <label class="sr-only" for="category-filter">Filter tasks by category. The list of tasks will update automatically.</label>
-            <!-- Hidden select for accessibility -->
+            <!-- Hidden select for screen readers -->
             <select
               id="category-filter"
               v-model="categoryFilter"

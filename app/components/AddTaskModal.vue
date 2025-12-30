@@ -92,10 +92,10 @@
         </div>
 
         <div>
-          <div class="block pb-2 font-bold">Task Category</div>
+          <div class="block pb-2 font-bold">Category</div>
           <!-- Hidden select for screen readers -->
           <label class="sr-only" for="add-category">
-            Select an existing task category. To add a new category, click the "New Category" button below, and the new category you add will be automatically selected.
+            Select an existing category. To add a new category, click the "New Category" button below, and the new category you add will be automatically selected.
           </label>
           <select 
             id="add-category" 
