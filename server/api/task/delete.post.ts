@@ -9,24 +9,25 @@ const bodySchema = z.object({
 // POST /api/task/delete
 // Deletes a task from a board
 export default defineEventHandler(async (e) => {
-  await checkAPIWriteEnabled(e)
+  try {
+    await checkAPIWriteEnabled(e)
   
-  const userId = await getUserId(e)
-  const bodyParse = await readValidatedBody(e, (b) => bodySchema.safeParse(b))
-  const bodyData = checkParseResult(bodyParse)
+    const userId = await getUserId(e)
+    const bodyParse = await readValidatedBody(e, (b) => bodySchema.safeParse(b))
+    const bodyData = checkParseResult(bodyParse)
 
-  const db = useDB(e)
-  
-  const boardInfo = await getBoardInfo(db, bodyData.boardId, userId)
-  if (!canEdit(boardInfo.isOwner, boardInfo.publicPerms)) {
-    throw createError({
-      status: 403,
-      message: "You do not have permission to delete tasks on this board."
-    })
+    const db = useDB(e)
+    
+    const boardInfo = await getBoardInfo(db, bodyData.boardId, userId)
+    if (!canEdit(boardInfo.isOwner, boardInfo.publicPerms)) {
+      throw forbiddenError("You do not have permission to delete tasks on this board.")
+    }
+
+    await checkTaskExists(db, bodyData.boardId, bodyData.taskId)
+
+    await db.deleteTask(bodyData.taskId)
+    setResponseStatus(e, 204)
+  } catch (err) {
+    handleError(err)
   }
-
-  await checkTaskExists(db, bodyData.boardId, bodyData.taskId)
-
-  await db.deleteTask(bodyData.taskId)
-  setResponseStatus(e, 204)
 })

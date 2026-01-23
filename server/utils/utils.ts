@@ -12,21 +12,64 @@ export const CATEGORY_COLOURS = [
   'fuchsia',
   'pink'
 ]
+
+export const badRequestError = (message: string) => {
+  return createError({
+    status: 400,
+    statusText: "Bad Request",
+    message
+  })
+}
+
+export const forbiddenError = (message: string) => {
+  return createError({
+    status: 403,
+    statusText: "Forbidden",
+    message
+  })
+}
+
+export const notFoundError = (message: string) => {
+  return createError({
+    status: 404,
+    statusText: "Not Found",
+    message
+  })
+}
+
+export const internalServerError = (message: string) => {
+  return createError({
+    status: 500,
+    statusText: "Internal Server Error",
+    message
+  })
+}
+
+export const serviceUnavailableError = (message: string) => {
+  return createError({
+    status: 503,
+    statusText: "Service Unavailable",
+    message
+  })
+}
+
+export const handleError = (e: unknown) => {
+  if (e instanceof H3Error) {
+    throw e
+  } else {
+    console.error(e)
+    throw internalServerError("An unexpected error occurred.")
+  }
+}
   
 
 // Check if the API is enabled for read operations.
 export const checkAPIReadEnabled = async (e: H3Event) => {
   const config = await e.context.cloudflare.env.CF_KV.get("workers_api")
   if (!config) {
-    throw createError({
-      status: 500,
-      message: "API configuration is not set up correctly."
-    })
+    throw internalServerError("API configuration is not set up correctly.")
   } else if (!config.includes("read")) {
-    throw createError({
-      status: 503,
-      message: "The API is temporarily disabled. Please try again later."
-    })
+    throw serviceUnavailableError("The API is temporarily disabled. Please try again later.")
   } else {
     return
   }
@@ -36,15 +79,9 @@ export const checkAPIReadEnabled = async (e: H3Event) => {
 export const checkAPIWriteEnabled = async (e: H3Event) => {
   const kvVal = await e.context.cloudflare.env.CF_KV.get("workers_api")
   if (!kvVal) {
-    throw createError({
-      status: 500,
-      message: "API configuration is not set up correctly."
-    })
+    throw internalServerError("API configuration is not set up correctly.")
   } else if (!kvVal.includes("write")) {
-    throw createError({
-      status: 503,
-      message: "The API is temporarily disabled. Please try again later."
-    })
+    throw serviceUnavailableError("The API is temporarily disabled. Please try again later.")
   } else {
     return
   }
@@ -57,10 +94,7 @@ export const checkAPIWriteEnabled = async (e: H3Event) => {
 // This is used to check the result of a zod parse in the API handlers.
 export const checkParseResult = <T>(b: z.ZodSafeParseResult<T>) => {
   if (!b.success) {
-    throw createError({
-      status: 400,
-      message: "Invalid request format"
-    })
+    throw badRequestError("Invalid request format")
   } else {
     return b.data
   }
@@ -69,10 +103,7 @@ export const checkParseResult = <T>(b: z.ZodSafeParseResult<T>) => {
 // Check if a task exists on a board.
 export const checkTaskExists = async (db: db, boardId: string, taskId: string) => {
   if (!(await db.isTaskExists(boardId, taskId))) {
-    throw createError({
-      status: 400,
-      message: "Invalid task ID"
-    })
+    throw badRequestError("Invalid task ID")
   }
 }
 
@@ -105,11 +136,8 @@ export const canEdit = (
 // the title of the board, and the public permissions of the board.
 export const getBoardInfo = async (db: db, boardId: string, userId: string | null) => {
   const dbData = await db.getBoard(boardId)
-  if (dbData.length === 0) {
-    throw createError({
-      status: 400,
-      message: 'Invalid board ID.'
-    })
+  if (dbData.length === 0 || !dbData[0]) {
+    throw badRequestError("Invalid board ID")
   } else {
     const categoriesList = []
     if (dbData[0].categoryId !== null) {

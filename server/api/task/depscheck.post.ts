@@ -12,24 +12,28 @@ const bodySchema = z.object({
 // This route is called automatically by the client when 
 // it detects an error in the number of dependencies for a task.
 export default defineEventHandler(async (e) => {
-  await checkAPIWriteEnabled(e)
+  try {
+    await checkAPIWriteEnabled(e)
   
-  const bodyParse = await readValidatedBody(e, (b) => bodySchema.safeParse(b))
-  const bodyData = checkParseResult(bodyParse)
+    const bodyParse = await readValidatedBody(e, (b) => bodySchema.safeParse(b))
+    const bodyData = checkParseResult(bodyParse)
 
-  const db = useDB(e)
-  await checkTaskExists(db, bodyData.boardId, bodyData.taskId)
+    const db = useDB(e)
+    await checkTaskExists(db, bodyData.boardId, bodyData.taskId)
 
-  console.log(`depscheck ${bodyData.boardId} ${bodyData.taskId}`)
+    console.log(`depscheck ${bodyData.boardId} ${bodyData.taskId}`)
 
-  const deps = await db.getSourceDepsInfo(bodyData.taskId)
-  let num = 0
-  for (const i of deps) {
-    if (!i.isComplete) {
-      num += 1
+    const deps = await db.getSourceDepsInfo(bodyData.taskId)
+    let num = 0
+    for (const i of deps) {
+      if (!i.isComplete) {
+        num += 1
+      }
     }
-  }
 
-  await db.setTaskNumDeps(bodyData.taskId, num)
-  return { numDeps: num }
+    await db.setTaskNumDeps(bodyData.taskId, num)
+    return { numDeps: num }
+  } catch (err) {
+    handleError(err)
+  }
 })

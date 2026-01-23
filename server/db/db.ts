@@ -158,7 +158,7 @@ export class db {
    * Delete all boards owned by a user.
    * @param userId user ID
    */
-  public deleteUserBaords = async (userId: string) => {
+  public deleteUserBoards = async (userId: string) => {
     await this._db.batch([
       this._db.delete(deps)
       .where(exists(
@@ -252,7 +252,7 @@ export class db {
         eq(tasks.taskId, second)
       )
     ))
-    if (dbData.length < 2) {
+    if (dbData.length < 2 || !dbData[0] || !dbData[1]) {
       return []
     } else if (dbData[0].taskId === first) {
       return [dbData[0], dbData[1]]
@@ -439,6 +439,10 @@ export class db {
     const task = await this._db.select()
     .from(tasks)
     .where(eq(tasks.taskId, taskId))
+
+    if (task.length === 0 || !task[0]) {
+      return
+    }
     if (task[0].isComplete) {
       await this._db.batch([
         this._db.delete(deps)

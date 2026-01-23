@@ -45,61 +45,50 @@ const bodySchema = z.object({
 // POST /api/deps/add
 // Adds a dependency between two tasks on a board.
 export default defineEventHandler(async (e) => {  
-  await checkAPIWriteEnabled(e)
+  try {
+    await checkAPIWriteEnabled(e)
+    
+    const userId = await getUserId(e)
+    const bodyParse = await readValidatedBody(e, (b) => bodySchema.safeParse(b))
+    const bodyData = checkParseResult(bodyParse)
+    if (bodyData.source === bodyData.dest) {
+      throw badRequestError("Cannot create a dependency with the same task.")
+    }
+
+    const db = useDB(e)
+    const boardInfo = await getBoardInfo(db, bodyData.boardId, userId)
+    if (!canEdit(boardInfo.isOwner, boardInfo.publicPerms)) {
+      throw forbiddenError("You do not have permission to edit tasks on this board.")
+    }
+
+    const depsExists = await db.isDepsExist(bodyData.source, bodyData.dest)
+    if (depsExists) {
+      throw badRequestError("Dependency already exists.")
+    }
   
-  const userId = await getUserId(e)
-  const bodyParse = await readValidatedBody(e, (b) => bodySchema.safeParse(b))
-  const bodyData = checkParseResult(bodyParse)
-  if (bodyData.source === bodyData.dest) {
-    throw createError({
-      status: 400,
-      message: "Cannot create a dependency with the same task."
-    })
-  }
+    const tasksInfo = await db.getTaskPair(bodyData.boardId, bodyData.source, bodyData.dest)
+    if (tasksInfo.length < 2 || !tasksInfo[0] || !tasksInfo[1]) {
+      throw badRequestError("One or more task IDs are invalid.")
+    }
 
-  const db = useDB(e)
-  const boardInfo = await getBoardInfo(db, bodyData.boardId, userId)
-  if (!canEdit(boardInfo.isOwner, boardInfo.publicPerms)) {
-    throw createError({
-      status: 403,
-      message: "You do not have permission to edit tasks on this board."
-    })
-  }
+    let newNum: number
+    if (tasksInfo[1].isComplete) {
+      newNum = tasksInfo[0].numDeps
+    } else if (tasksInfo[0].numDeps < 1) {
+      newNum = 1
+    } else {
+      newNum = tasksInfo[0].numDeps + 1
+    }
+    
+    const depsList = await db.getDeps(boardInfo.boardId)
 
-  const depsExists = await db.isDepsExist(bodyData.source, bodyData.dest)
-  if (depsExists) {
-    throw createError({
-      status: 400,
-      message: "Dependency already exists."
-    })
-  }
- 
-  const tasksInfo = await db.getTaskPair(bodyData.boardId, bodyData.source, bodyData.dest)
-  if (tasksInfo.length < 2) {
-    throw createError({
-      status: 400,
-      message: "One or more task IDs are invalid."
-    })
-  }
+    if (checkCycle(depsList, bodyData.source, bodyData.dest)) {
+      throw badRequestError("Cannot create a circular dependency.")
+    }
 
-  let newNum: number
-  if (tasksInfo[1].isComplete) {
-    newNum = tasksInfo[0].numDeps
-  } else if (tasksInfo[0].numDeps < 1) {
-    newNum = 1
-  } else {
-    newNum = tasksInfo[0].numDeps + 1
+    await db.addDeps(bodyData.source, bodyData.dest, newNum)
+    setResponseStatus(e, 204)
+  } catch (err) {
+    handleError(err)
   }
-  
-  const depsList = await db.getDeps(boardInfo.boardId)
-
-  if (checkCycle(depsList, bodyData.source, bodyData.dest)) {
-    throw createError({
-      status: 400,
-      message: "Cannot create a circular dependency."
-    })
-  }
-
-  await db.addDeps(bodyData.source, bodyData.dest, newNum)
-  setResponseStatus(e, 204)
 })

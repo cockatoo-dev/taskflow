@@ -11,28 +11,29 @@ const querySchema = z.object({
 // This includes the task itself, the board it is on, 
 // and the dependencies of the task.
 export default defineEventHandler(async (e) => {
-  await checkAPIReadEnabled(e)
-  
-  const userId = await getUserId(e)
+  try {
+    await checkAPIReadEnabled(e)
+    
+    const userId = await getUserId(e)
 
-  const queryParse = await getValidatedQuery(e, (q) => querySchema.safeParse(q))
-  const queryData = checkParseResult(queryParse)
-  
-  const db = useDB(e)
+    const queryParse = await getValidatedQuery(e, (q) => querySchema.safeParse(q))
+    const queryData = checkParseResult(queryParse)
+    
+    const db = useDB(e)
 
-  const boardInfo = await getBoardInfo(db, queryData.boardId, userId)
-  const dbTaskData = await db.getTask(queryData.boardId, queryData.taskId)
-  if (dbTaskData.length < 1) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid task ID"
-    })
-  }
-  
-  const dbDepsData = await db.getSourceDepsInfo(queryData.taskId)
-  return {
-    board: boardInfo,
-    task: dbTaskData[0],
-    deps: dbDepsData
+    const boardInfo = await getBoardInfo(db, queryData.boardId, userId)
+    const dbTaskData = await db.getTask(queryData.boardId, queryData.taskId)
+    if (dbTaskData.length < 1) {
+      throw badRequestError("Invalid task ID")
+    }
+    
+    const dbDepsData = await db.getSourceDepsInfo(queryData.taskId)
+    return {
+      board: boardInfo,
+      task: dbTaskData[0],
+      deps: dbDepsData
+    }
+  } catch (err) {
+    handleError(err)
   }
 })

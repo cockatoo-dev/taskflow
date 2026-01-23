@@ -7,20 +7,22 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (e) => {
-  await checkAPIWriteEnabled(e)
+  try {
+    await checkAPIWriteEnabled(e)
   
-  const bodyParse = await readValidatedBody(e, (b) => bodySchema.safeParse(b))
-  const bodyData = checkParseResult(bodyParse)
+    const bodyParse = await readValidatedBody(e, (b) => bodySchema.safeParse(b))
+    const bodyData = checkParseResult(bodyParse)
 
-  const userId = await getUserId(e)
-  const db = useDB(e)
-  const boardInfo = await getBoardInfo(db, bodyData.boardId, userId)
-  if (!canEdit(boardInfo.isOwner, boardInfo.publicPerms)) {
-    throw createError({
-      status: 403,
-      message: 'You do not have permission to modify this board.'
-    })
+    const userId = await getUserId(e)
+    const db = useDB(e)
+    const boardInfo = await getBoardInfo(db, bodyData.boardId, userId)
+    if (!canEdit(boardInfo.isOwner, boardInfo.publicPerms)) {
+      throw forbiddenError('You do not have permission to modify this board.')
+    }
+
+    await db.deleteCategory(bodyData.categoryId)
+    setResponseStatus(e, 204)
+  } catch (err) {
+    handleError(err)
   }
-
-  await db.deleteCategory(bodyData.categoryId)
 })
