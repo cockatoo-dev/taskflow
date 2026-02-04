@@ -2,7 +2,6 @@
 // Login with GitHub handler via nuxt-auth-utils
 export default defineEventHandler((e) => {
   try {
-    console.log('Github login')
     return defineOAuthGitHubEventHandler({
       onSuccess: async (e, {user}) => {
         await setUserSession(e, {
