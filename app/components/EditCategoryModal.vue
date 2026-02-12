@@ -60,7 +60,7 @@
       await props.refresh()
       isVisible.value = false
     } catch (error) {
-      errorMessage.value = "An error occurred while editing the category."
+      fetchErrorHandler(error, errorMessage)
     } finally {
       disableSubmit.value = false
     }
@@ -80,7 +80,7 @@
       await props.refresh()
       isVisible.value = false
     } catch (error) {
-      errorMessage.value = "An error occurred while deleting the category."
+      fetchErrorHandler(error, errorMessage)
     } finally {
       disableSubmit.value = false
     }

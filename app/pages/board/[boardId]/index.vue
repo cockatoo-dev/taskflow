@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { FetchError } from "ofetch"
   const route = useRoute()
 
   let refreshInterval: ReturnType<typeof setTimeout>

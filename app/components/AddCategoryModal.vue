@@ -67,7 +67,7 @@
       emit('added', result.categoryId)
       isVisible.value = false
     } catch (error) {
-      errorMessage.value = "An error occurred while adding the category."
+      fetchErrorHandler(error, errorMessage)
     } finally {
       disableSubmit.value = false
     }

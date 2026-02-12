@@ -4,8 +4,6 @@
   const route = useRoute()
   const clipboard = useClipboard()
 
-  
-
   // Copy board link to clipboard
   const copyLink = () => {
     clipboard.copy(`https://${BASE_URL}/board/${route.params.boardId}`)
@@ -34,7 +32,7 @@
         <div class="pb-2 text-center text-xl md:text-2xl">To open this board in your web browser,</div>
         <div class="block sm:grid sm:grid-cols-[60%_40%]">
           <div class="flex flex-col justify-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold p-2 sm:p-4 border-b sm:border-b-0 sm:border-r sm:border-slate-300 sm:dark:border-slate-700">
-            <div class="leading-snug break-words">
+            <div class="leading-snug wrap-break-word">
               Go to 
               <span class="text-teal-600 dark:text-teal-400">{{ BASE_URL }}</span>
               and enter board code
@@ -49,7 +47,7 @@
       </div>
     </div>
     <div class="p-4 text-center">
-      <div class="break-words">
+      <div class="wrap-break-word">
         You can also send this link to people: 
         <a 
           class="text-teal-600 dark:text-teal-400 hover:underline" 

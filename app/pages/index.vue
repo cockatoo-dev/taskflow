@@ -53,7 +53,7 @@
     <main class="w-full min-h-[calc(100vh-9rem)] bg-teal-50 dark:bg-teal-950">
       <StdContainer>
         <div class="py-8 sm:py-16">
-          <h1 class="text-3xl sm:text-6xl sm:leading-[1.25] font-bold text-center">
+          <h1 class="text-3xl sm:text-6xl sm:leading-tight font-bold text-center">
             Task tracking for
             <br>
             <span class="text-teal-600 dark:text-teal-400">keeping your team coordinated.</span>
@@ -89,7 +89,7 @@
             </div>
             <FormError :message="errorMessage" />
           </form>
-          <div class="pt-2 max-w-[720px] mx-auto">
+          <div class="pt-2 max-w-180 mx-auto">
             <div class="text-center pb-2">or</div>
             <div class="text-center">
               <UButton 
@@ -110,7 +110,7 @@
             <p class="py-2">Easily see all of your team's tasks on a virtual board, and know what tasks are left to complete. The virtual board is ideal for being shown on a large screen. </p>
           </div>
           <div class="sm:order-2 sm:pl-2">
-            <div class="w-full max-w-[488px] mx-auto grid grid-cols-2">
+            <div class="w-full max-w-122 mx-auto grid grid-cols-2">
               <HomepageTaskItem title="Task 1" status="ready"/>
               <HomepageTaskItem title="Task 2" status="ready"/>
               <HomepageTaskItem title="Task 3" status="ready"/>
@@ -124,7 +124,7 @@
             <p class="py-2">Set tasks that must be completed before other tasks are ready to be completed, and clearly see the tasks that can be completed right now.</p>
           </div>
           <div class="sm:order-1 sm:pr-2">
-            <div class="w-full max-w-[488px] mx-auto grid grid-cols-2">
+            <div class="w-full max-w-122 mx-auto grid grid-cols-2">
               <HomepageTaskItem title="Task 6" status="ready"/>
               <HomepageTaskItem title="Task 7" status="ready"/>
               <HomepageTaskItem title="Task 8" status="not ready"/>
@@ -138,7 +138,7 @@
             <p class="py-2">Each board has a unique board code, along with a QR code and a shareable link, so your team members can easily open your board in their web browsers.</p>
           </div>
           <div class="sm:order-2 sm:pl-2">
-            <div class="w-full max-w-[488px] mx-auto p-2 bg-white dark:bg-slate-900 rounded-md shadow-md">
+            <div class="w-full max-w-122 mx-auto p-2 bg-white dark:bg-slate-900 rounded-md shadow-md">
               <div class="grid grid-cols-[70%_30%]">
                 <div class="pl-2 flex flex-col justify-center border-r border-r-slate-300 dark:border-r-slate-700 text-3xl font-bold leading-snug">
                   Board code

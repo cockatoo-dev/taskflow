@@ -94,7 +94,7 @@ export const checkAPIWriteEnabled = async (e: H3Event) => {
 // This is used to check the result of a zod parse in the API handlers.
 export const checkParseResult = <T>(b: z.ZodSafeParseResult<T>) => {
   if (!b.success) {
-    throw badRequestError("Invalid request format")
+    throw badRequestError("Invalid request format.")
   } else {
     return b.data
   }
@@ -103,7 +103,7 @@ export const checkParseResult = <T>(b: z.ZodSafeParseResult<T>) => {
 // Check if a task exists on a board.
 export const checkTaskExists = async (db: db, boardId: string, taskId: string) => {
   if (!(await db.isTaskExists(boardId, taskId))) {
-    throw badRequestError("Invalid task ID")
+    throw badRequestError("Invalid task ID.")
   }
 }
 
@@ -137,7 +137,7 @@ export const canEdit = (
 export const getBoardInfo = async (db: db, boardId: string, userId: string | null) => {
   const dbData = await db.getBoard(boardId)
   if (dbData.length === 0 || !dbData[0]) {
-    throw badRequestError("Invalid board ID")
+    throw badRequestError("Invalid board ID.")
   } else {
     const categoriesList = []
     if (dbData[0].categoryId !== null) {

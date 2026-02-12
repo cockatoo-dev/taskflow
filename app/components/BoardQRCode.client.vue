@@ -33,7 +33,7 @@
 
 <template>
   <img 
-    class="block w-full max-w-[360px] mx-auto" 
+    class="block w-full max-w-90 mx-auto" 
     :src="imgDataUrl"
     alt="QR code which directs people to this board."
   >

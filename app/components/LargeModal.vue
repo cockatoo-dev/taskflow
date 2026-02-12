@@ -14,7 +14,7 @@
     :transition="isMotionSafe"
     :title
     :description
-    class="w-11/12 sm:max-w-full lg:w-[960px]"
+    class="w-11/12 sm:max-w-full lg:w-240"
   >
     <template #content>
       <div class="text-slate-800 dark:text-slate-200 overflow-y-auto">
