@@ -99,8 +99,8 @@
           </label>
           <select 
             id="add-category" 
-            class="sr-only" 
             v-model="category"
+            class="sr-only" 
           >
             <option :value="null">Uncategorised</option>
             <option 

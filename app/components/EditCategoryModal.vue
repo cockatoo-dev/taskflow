@@ -100,7 +100,7 @@
           <div>
             <label for="category-colour" class="sr-only">Category Colour</label>
             <!-- Hidden select for screen readers -->
-            <select id="category-colour" class="sr-only" v-model="colour">
+            <select id="category-colour" v-model="colour" class="sr-only">
               <option 
                 v-for="option in colourOptions" 
                 :key="option" 

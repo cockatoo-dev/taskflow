@@ -106,8 +106,8 @@
           </label>
           <select 
             id="edit-category" 
-            class="sr-only" 
             v-model="editCategory"
+            class="sr-only" 
           >
             <option :value="null">Uncategorised</option>
             <option 

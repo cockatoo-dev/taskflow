@@ -183,6 +183,7 @@ export const isAvailableCategoryColour = (colour: string, categories: {colour: s
 export const getUserId = async (e: H3Event) => {
   const session = await getUserSession(e)
   if (session.user) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return session.user.userId
   } else {
@@ -194,6 +195,7 @@ export const getUserId = async (e: H3Event) => {
 // or throw an error if the user is not logged in.
 export const requireUserId = async (e: H3Event) => {
   const session = await requireUserSession(e)
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return session.user.userId
 }
